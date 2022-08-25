@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/coinbase/coinbase-commerce-php/tree/master.svg?style=svg)](https://circleci.com/gh/coinbase/coinbase-commerce-php/tree/master)
+[![CircleCI](https://circleci.com/gh/detain/coinbase-commerce-php/tree/master.svg?style=svg)](https://circleci.com/gh/detain/coinbase-commerce-php/tree/master)
 # Coinbase Commerce
 **Note: This repository is not actively maintained.**
 
@@ -68,7 +68,7 @@ All errors that occur during any interaction with the API will be raised as exce
 
 Install with ``composer``:
 ``` sh
-composer require coinbase/coinbase-commerce
+composer require detain/coinbase-commerce
 ```
 ## Usage
 ``` php
