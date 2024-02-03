@@ -24,7 +24,7 @@ class ApiResource extends \ArrayObject
         $this->clearAttributes();
 
         if ($data instanceof ApiResponse) {
-            $data = isset($data->bodyArray['data']) ? $data->bodyArray['data'] : null;
+            $data = $data->bodyArray['data'] ?? null;
         }
 
         foreach ($data as $key => $value) {

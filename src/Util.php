@@ -15,7 +15,7 @@ class Util
     public static function convertToApiObject($response)
     {
         if ($response instanceof ApiResponse) {
-            $response = isset($response->bodyArray['data']) ? $response->bodyArray['data'] : null;
+            $response = $response->bodyArray['data'] ?? null;
         }
 
         if (is_array($response)) {
@@ -44,7 +44,7 @@ class Util
             ];
         }
 
-        return isset(self::$mapResourceByName[$name]) ? self::$mapResourceByName[$name] : null;
+        return self::$mapResourceByName[$name] ?? null;
     }
 
     /**

@@ -3,9 +3,9 @@ namespace CoinbaseCommerce;
 
 class ApiResourceList extends \ArrayObject
 {
-    const CURSOR_PARAM = 'cursor_range';
-    const PREV_CURSOR = 'ending_before';
-    const NEXT_CURSOR = 'starting_after';
+    public const CURSOR_PARAM = 'cursor_range';
+    public const PREV_CURSOR = 'ending_before';
+    public const NEXT_CURSOR = 'starting_after';
 
     private static $apiClient;
 
@@ -139,7 +139,7 @@ class ApiResourceList extends \ArrayObject
         $response = $client->get($path, $params, $this->headers);
         $responseData = $response->bodyArray;
 
-        $this->pagination = isset($responseData['pagination']) ? $responseData['pagination'] : [];
+        $this->pagination = $responseData['pagination'] ?? [];
         $this->items = [];
 
         if (isset($responseData['data'])) {

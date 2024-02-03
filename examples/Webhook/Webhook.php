@@ -11,7 +11,7 @@ use CoinbaseCommerce\Webhook;
 $secret = 'SECRET_KEY';
 $headerName = 'X-Cc-Webhook-Signature';
 $headers = getallheaders();
-$signatureHeader = isset($headers[$headerName]) ? $headers[$headerName] : null;
+$signatureHeader = $headers[$headerName] ?? null;
 $payload = trim(file_get_contents('php://input'));
 
 try {

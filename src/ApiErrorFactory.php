@@ -42,7 +42,7 @@ class ApiErrorFactory
             ];
         }
 
-        return isset(self::$mapErrorMessageToClass[$message]) ? self::$mapErrorMessageToClass[$message]: null;
+        return self::$mapErrorMessageToClass[$message]?? null;
     }
 
     /**
@@ -62,7 +62,7 @@ class ApiErrorFactory
             ];
         }
 
-        return isset(self::$mapErrorCodeToClass[$code]) ? self::$mapErrorCodeToClass[$code]: null;
+        return self::$mapErrorCodeToClass[$code]?? null;
     }
 
     /**
@@ -74,8 +74,8 @@ class ApiErrorFactory
         $request = $exception->getRequest();
         $code = $exception->getCode();
         $data = $response ? json_decode($response->getBody(), true) : null;
-        $errorMessage = isset($data['error']['message']) ? $data['error']['message'] : $exception->getMessage();
-        $errorId = isset($data['error']['type']) ? $data['error']['type'] : null;
+        $errorMessage = $data['error']['message'] ?? $exception->getMessage();
+        $errorId = $data['error']['type'] ?? null;
 
         $errorClass = self::getErrorClassByMessage($errorId) ?: self::getErrorClassByCode($code) ?: ApiException::getClassName();
 

@@ -7,7 +7,7 @@ namespace CoinbaseCommerce;
  */
 class ApiResponse
 {
-    const REQUEST_ID_HEADER = 'x-request-id';
+    public const REQUEST_ID_HEADER = 'x-request-id';
     /**
      * @var array
      */
