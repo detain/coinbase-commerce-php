@@ -62,7 +62,6 @@ trait ReadMethodTrait
         $client = static::getClient();
 
         $loadPage = function ($params, &$list) use (&$loadPage, $client, $path, $headers) {
-
             $response = $client->get($path, $params, $headers);
             $responseData = $response->bodyArray;
             $items = array_map(

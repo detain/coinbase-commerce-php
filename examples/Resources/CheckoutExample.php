@@ -30,7 +30,6 @@ try {
 }
 
 if ($checkoutObj->id) {
-
     $checkoutObj->name = "New name";
 
     // Update "name"

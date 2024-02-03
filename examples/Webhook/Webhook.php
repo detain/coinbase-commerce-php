@@ -22,8 +22,3 @@ try {
     http_response_code(400);
     echo 'Error occured. ' . $exception->getMessage();
 }
-
-
-
-
-

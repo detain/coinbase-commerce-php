@@ -12,16 +12,16 @@ use CoinbaseCommerce\Resources\Invoice;
 ApiClient::init("API_KEY");
 
 $invoiceObj = new Invoice(
-	[
-	    'business_name' => 'Crypto Account LLC',
-	    'customer_email' => 'customer@test.com',
-	    'customer_name' => 'Test Customer',
-	    'local_price' => [
-	        'amount' => '100.00',
-	        'currency' => 'USD'
-	    ],
-	    'memo' => 'Taxes and Accounting Services'
-	]
+    [
+        'business_name' => 'Crypto Account LLC',
+        'customer_email' => 'customer@test.com',
+        'customer_name' => 'Test Customer',
+        'local_price' => [
+            'amount' => '100.00',
+            'currency' => 'USD'
+        ],
+        'memo' => 'Taxes and Accounting Services'
+    ]
 );
 
 try {

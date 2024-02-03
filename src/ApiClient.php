@@ -362,8 +362,8 @@ class ApiClient
 
     public function verifySsl($verify)
     {
-        if(!is_bool($verify)) {
-           return;
+        if (!is_bool($verify)) {
+            return;
         }
         $this->verifySSL = $verify ;
     }
