@@ -21,7 +21,7 @@ $invoiceObj = new Invoice(
 	        'currency' => 'USD'
 	    ],
 	    'memo' => 'Taxes and Accounting Services'
-	];
+	]
 );
 
 try {
