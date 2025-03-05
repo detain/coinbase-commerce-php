@@ -127,7 +127,8 @@ class ApiResource extends \ArrayObject
         self::$client = $client;
     }
 
-    protected static function getClient(): mixed
+// #[\\ReturnTypeWillChange]
+    protected static function getClient()
     {
         if (self::$client) {
             return self::$client;
@@ -136,7 +137,8 @@ class ApiResource extends \ArrayObject
         return ApiClient::getInstance();
     }
 
-    public function offsetGet($key): mixed
+// #[\\ReturnTypeWillChange]
+    public function offsetGet($key)
     {
         return $this->__get($key);
     }
