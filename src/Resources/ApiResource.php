@@ -122,12 +122,12 @@ class ApiResource extends \ArrayObject
         return print_r($this->attributes, true);
     }
 
-    public static function setClient($client)
+    public static function setClient($client): void
     {
         self::$client = $client;
     }
 
-    protected static function getClient()
+    protected static function getClient(): mixed
     {
         if (self::$client) {
             return self::$client;
@@ -136,37 +136,37 @@ class ApiResource extends \ArrayObject
         return ApiClient::getInstance();
     }
 
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->__get($key);
     }
 
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         null === $key ? array_push($this->attributes, $value) : $this->attributes[$key] = $value;
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->attributes);
     }
 
-    public function asort(int $flags = SORT_REGULAR)
+    public function asort(int $flags = SORT_REGULAR): bool
     {
         asort($this->attributes, $flags);
     }
 
-    public function ksort(int $flags = SORT_REGULAR)
+    public function ksort(int $flags = SORT_REGULAR): bool
     {
         ksort($this->attributes, $flags);
     }
 
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         unset($this->attributes[$key]);
     }
 
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return new \ArrayIterator($this->attributes);
     }
