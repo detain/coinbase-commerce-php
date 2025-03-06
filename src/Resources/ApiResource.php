@@ -153,12 +153,12 @@ class ApiResource extends \ArrayObject
         return count($this->attributes);
     }
 
-    public function asort(int $flags = SORT_REGULAR): bool
+    public function asort(int $flags = SORT_REGULAR): true
     {
         asort($this->attributes, $flags);
     }
 
-    public function ksort(int $flags = SORT_REGULAR): bool
+    public function ksort(int $flags = SORT_REGULAR): true
     {
         ksort($this->attributes, $flags);
     }
