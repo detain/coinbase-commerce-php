@@ -1,36 +1,84 @@
 [![CircleCI](https://circleci.com/gh/detain/coinbase-commerce-php/tree/master.svg?style=svg)](https://circleci.com/gh/detain/coinbase-commerce-php/tree/master)
 # Coinbase Commerce
-**Note: This repository is not actively maintained.**
 
-The official PHP library for the [Coinbase Commerce API](https://commerce.coinbase.com/docs/).
+PHP library for the [Coinbase Commerce API](https://commerce.coinbase.com/docs/) and the new [Coinbase Payment Link API](https://docs.cdp.coinbase.com/commerce-onchain/docs/payment-links).
 
 # Table of contents
 
 <!--ts-->
-   * [PHP Versions](#php-version)
+   * [PHP Versions](#php-versions)
    * [Documentation](#documentation)
    * [Installation](#installation)
    * [Usage](#usage)
-      * [Checkouts](#checkouts)
-      * [Charges](#charges)
-      * [Invoices](#invoices)
-      * [Events](#events)
-      * [Webhooks](#webhooks)
-      * [Warnings](#warnings)
+      * [Commerce API (Legacy)](#commerce-api-legacy)
+         * [Checkouts](#checkouts)
+         * [Charges](#charges)
+         * [Invoices](#invoices)
+         * [Events](#events)
+         * [Webhooks](#webhooks)
+         * [Warnings](#warnings)
+      * [Payment Link API (New)](#payment-link-api-new)
+         * [Authentication](#authentication)
+         * [Create a Payment Link](#create-a-payment-link)
+         * [Get a Payment Link](#get-a-payment-link)
+         * [List Payment Links](#list-payment-links)
+         * [Deactivate a Payment Link](#deactivate-a-payment-link)
+         * [Idempotency](#idempotency)
+         * [Payment Link Webhooks](#payment-link-webhooks)
    * [Testing and Contributing](#testing-and-contributing)
 <!--te-->
 
 ## PHP versions
-PHP  version 5.4 and above are supported.
+PHP version 7.4 and above is supported.
 
 ## Documentation
-For more details visit [Coinbase API docs](https://commerce.coinbase.com/docs/api/).
 
-To start using this library register an account on [Coinbase Commerce](https://commerce.coinbase.com/signup).
+This library supports two Coinbase APIs:
+
+| | Commerce API (Legacy) | Payment Link API (New) |
+|---|---|---|
+| **Auth** | `X-CC-Api-Key` header | JWT Bearer token (ES256) |
+| **Base URL** | `api.commerce.coinbase.com` | `business.coinbase.com/api/v1` |
+| **Currency** | Multiple cryptocurrencies | USDC only |
+| **Resources** | Checkout, Charge, Invoice, Event | PaymentLink |
+| **Namespace** | `CoinbaseCommerce\` | `CoinbaseCommerce\PaymentLink\` |
+
+- **Commerce API docs:** [commerce.coinbase.com/docs/api](https://commerce.coinbase.com/docs/api/)
+- **Payment Link API docs:** [docs.cdp.coinbase.com/commerce-onchain/docs/payment-links](https://docs.cdp.coinbase.com/commerce-onchain/docs/payment-links)
+
+All errors that occur during any interaction with either API will be raised as exceptions:
+
+| Error                        | Status Code |
+|------------------------------|-------------|
+| APIException                 |      *      |
+| InvalidRequestException      |     400     |
+| ParamRequiredException       |     400     |
+| ValidationException          |     400     |
+| AuthenticationException      |     401     |
+| ResourceNotFoundException    |     404     |
+| RateLimitExceededException   |     429     |
+| InternalServerException      |     500     |
+| ServiceUnavailableException  |     503     |
+
+## Installation
+
+Install with ``composer``:
+``` sh
+composer require detain/coinbase-commerce
+```
+
+This will also install `firebase/php-jwt` (required for the Payment Link API).
+
+## Usage
+
+---
+
+## Commerce API (Legacy)
+
+To start using the Commerce API, register an account on [Coinbase Commerce](https://commerce.coinbase.com/signup).
 You will find your ``API_KEY`` from User Settings.
 
-Next initialize a ``Client`` for interacting with the API. The only required parameter to initialize a client is ``apiKey``, however, you can also pass in ``baseUrl``, ``apiVersion``  and ``timeout``.
-Parameters can be also be set post-initialization:
+Initialize a ``Client`` for interacting with the API:
 ``` php
 use CoinbaseCommerce\ApiClient;
 
@@ -49,36 +97,17 @@ The API resource class provides the following static methods: ``list, all, creat
 Each API method returns an ``ApiResource`` which represents the JSON response from the API.
 When the response data is parsed into objects, the appropriate ``ApiResource`` subclass will automatically be used.
 
-Client supports the handling of common API errors and warnings.
-All errors that occur during any interaction with the API will be raised as exceptions.
-
-
-| Error                        | Status Code |
-|------------------------------|-------------|
-| APIException                 |      *      |   
-| InvalidRequestException      |     400     |   
-| ParamRequiredException       |     400     |  
-| ValidationException          |     400     |  
-| AuthenticationException      |     401     |  
-| ResourceNotFoundException    |     404     |
-| RateLimitExceededException   |     429     |
-| InternalServerException      |     500     |
-| ServiceUnavailableException  |     503     |
-
-## Installation
-
-Install with ``composer``:
-``` sh
-composer require detain/coinbase-commerce
-```
-## Usage
+### Warnings
+It's prudent to be conscious of warnings. The library will log all warnings to a standard PSR-3 logger if one is configured.
 ``` php
 use CoinbaseCommerce\ApiClient;
 
 //Make sure you don't store your API Key in your source code!
-ApiClient::init('API_KEY');
+$apiClientObj = ApiClient::init(<API_KEY>);
+$apiClientObj->setLogger($logger);
 ```
-## Checkouts 
+
+## Checkouts
 [Checkouts API docs](https://commerce.coinbase.com/docs/api/#checkouts)
 More examples on how to use checkouts can be found in the [`examples/Resources/CheckoutExample.php`](examples/Resources/CheckoutExample.php) file
 
@@ -368,16 +397,6 @@ $pagination = $listEvent->getPagination();
 $allEvents = Event::getAll();
 ```
 
-## Warnings
-It's prudent to be conscious of warnings. The library will log all warnings to a standard PSR-3 logger if one is configured.
-``` php
-use CoinbaseCommerce\ApiClient;
-
-//Make sure you don't store your API Key in your source code!
-$apiClientObj = ApiClient::init(<API_KEY>);
-$apiClientObj->setLogger($logger);
-```
-
 ## Webhooks
 Coinbase Commerce signs the webhook events it sends to your endpoint, allowing you to validate and verify that they weren't sent by someone else.
 You can find a simple example of how to use this with Express in the [`examples/Webhook`](examples/Webhook) folder
@@ -393,6 +412,141 @@ try {
     echo 'Failed';
 }
 ```
+
+---
+
+## Payment Link API (New)
+
+The Payment Link API uses CDP (Coinbase Developer Platform) API keys with ES256 JWT authentication. It currently supports **USDC** payments only.
+
+More examples can be found in [`examples/PaymentLink/`](examples/PaymentLink/).
+
+### Authentication
+
+You'll need a CDP API key from the [Coinbase Developer Platform](https://portal.cdp.coinbase.com/). This gives you a **key name** (used as the JWT `sub`/`kid`) and an **EC private key** (PEM format) for ES256 signing.
+
+``` php
+use CoinbaseCommerce\PaymentLink\PaymentLinkClient;
+use CoinbaseCommerce\PaymentLink\PaymentLink;
+
+// Initialize the client with your CDP credentials
+$client = new PaymentLinkClient(
+    getenv('COINBASE_CDP_KEY_NAME'),      // CDP API key ID
+    getenv('COINBASE_CDP_PRIVATE_KEY')     // EC private key PEM
+);
+
+// Optional: configure timeout (default 10s)
+$client = new PaymentLinkClient($keyName, $privateKey, [
+    'timeout' => 15,
+]);
+
+// Set the client for the static PaymentLink facade
+PaymentLink::setClient($client);
+```
+
+### Create a Payment Link
+``` php
+$result = PaymentLink::create([
+    'amount' => '100.00',
+    'currency' => 'USDC',
+    'description' => 'Payment for order #12345',
+    'successRedirectUrl' => 'https://example.com/success',
+    'failRedirectUrl' => 'https://example.com/failed',
+    'metadata' => [
+        'orderId' => '12345',
+        'customerId' => 'cust_abc123',
+    ],
+]);
+
+echo "Payment URL: {$result['url']}\n";
+echo "Status: {$result['status']}\n"; // ACTIVE
+```
+
+### Get a Payment Link
+``` php
+$link = PaymentLink::get($linkId);
+echo "Status: {$link['status']}\n";
+```
+
+### List Payment Links
+``` php
+$list = PaymentLink::list([
+    'pageSize' => 10,
+    'status' => 'ACTIVE',
+]);
+
+foreach ($list['paymentLinks'] as $link) {
+    echo "{$link['id']}: {$link['status']}\n";
+}
+```
+
+### Deactivate a Payment Link
+``` php
+$deactivated = PaymentLink::deactivate($linkId);
+echo "Status: {$deactivated['status']}\n"; // DEACTIVATED
+```
+
+### Idempotency
+Pass an idempotency key to safely retry `create` requests:
+``` php
+$result = PaymentLink::create($params, 'unique-request-id-123');
+```
+
+### Payment Link Webhooks
+
+The Payment Link API uses a different webhook signature format (`X-Hook0-Signature`) than the Commerce API.
+See [`examples/PaymentLink/WebhookExample.php`](examples/PaymentLink/WebhookExample.php) for a complete example.
+
+``` php
+use CoinbaseCommerce\PaymentLink\PaymentLinkWebhook;
+
+$payload = file_get_contents('php://input');
+$signatureHeader = $_SERVER['HTTP_X_HOOK0_SIGNATURE'] ?? '';
+
+// Collect request headers (normalized to lowercase keys)
+$headers = [];
+foreach ($_SERVER as $key => $value) {
+    if (strpos($key, 'HTTP_') === 0) {
+        $headerName = strtolower(str_replace('_', '-', substr($key, 5)));
+        $headers[$headerName] = $value;
+    }
+}
+$headers['content-type'] = $_SERVER['CONTENT_TYPE'] ?? 'application/json';
+
+try {
+    // Verifies signature, checks replay protection (5 min default), then parses JSON
+    $event = PaymentLinkWebhook::buildEvent($payload, $signatureHeader, $webhookSecret, $headers);
+
+    switch ($event['eventType']) {
+        case 'payment_link.payment.success':
+            // Fulfill the order
+            break;
+        case 'payment_link.payment.failed':
+            // Handle failure
+            break;
+        case 'payment_link.payment.expired':
+            // Handle expiry
+            break;
+    }
+
+    http_response_code(200);
+} catch (\CoinbaseCommerce\Exceptions\SignatureVerificationException $e) {
+    http_response_code(400);
+}
+```
+
+#### Payment Link Statuses
+
+| Status | Description |
+|--------|-------------|
+| `ACTIVE` | Link is live and accepting payments |
+| `PROCESSING` | Payment is being processed |
+| `COMPLETED` | Payment received successfully |
+| `EXPIRED` | Link expired without payment |
+| `DEACTIVATED` | Manually deactivated |
+| `FAILED` | Payment failed |
+
+---
 
 ### Testing and Contributing
 Any and all contributions are welcome! The process is simple: fork this repo, make your changes, run the test suite, and submit a pull request. To run the tests, clone the repository and run the following commands:
