@@ -27,6 +27,6 @@ class ApiException extends CoinbaseException
 
     public function getStatusCode()
     {
-        return $this->response->getStatusCode();
+        return $this->response !== null ? $this->response->getStatusCode() : null;
     }
 }
