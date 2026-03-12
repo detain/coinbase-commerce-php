@@ -45,6 +45,10 @@ This library supports two Coinbase APIs:
 
 - **Commerce API docs:** [commerce.coinbase.com/docs/api](https://commerce.coinbase.com/docs/api/)
 - **Payment Link API docs:** [docs.cdp.coinbase.com/commerce-onchain/docs/payment-links](https://docs.cdp.coinbase.com/commerce-onchain/docs/payment-links)
+- [Migrate from Commerce Overview](https://docs.cdp.coinbase.com/coinbase-business/payment-link-apis/migrate/overview)
+- [Coinbase Business API Key Authentication](https://docs.cdp.coinbase.com/coinbase-business/authentication-authorization/api-key-authentication)
+- [Webhooks](https://docs.cdp.coinbase.com/coinbase-business/payment-link-apis/webhooks)
+- [API & Schema Mapping](https://docs.cdp.coinbase.com/coinbase-business/payment-link-apis/migrate/api-schema-mapping)
 
 All errors that occur during any interaction with either API will be raised as exceptions:
 
