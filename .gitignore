@@ -9,3 +9,6 @@ composer.phar
 composer.lock
 Dockerfile*
 .dockerignore
+
+# Caliber local state
+.caliber/
